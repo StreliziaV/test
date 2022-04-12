@@ -1,7 +1,20 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-
+const bodyParser = require('body-parser');
 const app = express();
+
+// 允许跨域访问
+app.all('*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    res.header("X-Powered-By",' 3.2.1');
+    res.header("Content-Type", "application/json;charset=utf-8");
+    next();
+ });
+
+// 处理http请求，解析
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/user', (req, res) => {
     res.send({name: 'zs', age: 20, gender: 'male'});
@@ -42,6 +55,6 @@ app.post('/user', (req, res) => {
     res.send('request success');
 })
 
-app.listen(80, () => {
-    console.log('127.0.0.1:80');
+app.listen(8080, () => {
+    console.log('127.0.0.1:8080');
 })
