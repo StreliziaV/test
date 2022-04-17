@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foredawn</title>
+    <link rel="stylesheet" href="./css/my.css">
+    <link rel="icon" href="./image/fire.png" type="image/x-icon">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="container" id="normal_panel">
+        <!-- 头部 -->
+        <div class="header">
+            <div class="logo">
+                <img src="./image/fire.png" alt="">
+                <span>Foredawn</span>
+            </div>
+
+            <div class="middle">
+                <div class="search">
+                    <i class="iconfont icon-sousuo"></i>
+                    <input type="text" placeholder="search">
+                </div>
+            </div>
+
+            <div class="other">
+                <div class="menu">
+                    <img src="./image/store.png" alt="store">
+                    <img src="./image/message.png" alt="message">
+                    <img src="./image/setup.png" alt="setup">
+                </div>
+                <div>
+                    <input type="button" class="button">
+                </div>
+            </div>
+        </div>
+
+        <!-- 渐变线条 -->
+        <div class="line"></div>
+        <!-- 主体 -->
+        <div class="main">
+            <div class="left">
+                <div class="photo">
+                    <img src="./image/user.png" alt="User" id="photo">
+                </div>
+                <div class="outbox">
+                    <div class="skbox">
+                        <label for="photo_upload">
+                            <input type="button" id="btn" value="upload"><span id="text">Please upload image.</span>
+                            <input type="file" name="pic" id="pic" accept="image/jpeg,image/jpg,image/png,image/svg">
+                        </label>
+                    </div>
+                    <span></span>
+                    <div class="imgbox"><img></div>
+                </div>
+            </div>
+            <div class="right">
+                <div class="block">
+                    <label class="sr-only" for="form-username">Username</label>
+                    <p id="username">undefined</p><br>
+                </div>
+                <div class="block">
+                    <label class="sr-only" for="form-password">Password</label>
+                    <input type="button" id="modify" value="modify" class="button">
+                    <div id="hide">
+                        <input type="text" id="old" placeholder="old_pwd"><br>
+                        <input type="text" id="new" placeholder="new_pwd 8+ bits"><br>
+                        <input type="text" id="verif" placeholder="verify again"><br>
+                    </div>
+                </div>
+                <div class="block">
+                    <label class="sr-only" for="form-username">Email</label>
+                    <p id="email">undefined</p>
+                </div>
+                <div id="to_admin">
+                    <input type="button" id="to_admin_btn" value="Administrator Panel" class="button">
+                </div><br>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <div class="footer">
+            <span class="groupinfo">CSC4001 Group4</span>
+        </div>
+    </div>
+
+    <div id="admin_panel" display="none">
+        <input type="button" id="show_all_user" value="show all user" class="button"> <br>
+
+        <input type="button" id="modify_pw" value="modify password" class="button">
+        <div id="to_normal">
+            <input type="button" id="to_normal_btn" value="Normal Panel" class="button">
+        </div>
+        <div id="display_zone">
+            
+        </div>
+    </div>
+
+    <script src="js/admin.js" type="text/javascript" charset="utf-8"></script>
+</body>
+
+</html>
