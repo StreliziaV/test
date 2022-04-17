@@ -1,0 +1,254 @@
+var current_user = undefined;
+var modify = document.getElementById('modify');
+var photo = document.getElementById('photo');
+var to_admin_btn = document.getElementById('to_admin_btn');
+var to_normal_btn = document.getElementById('to_normal_btn');
+var normal_panel = document.getElementById('normal_panel');
+var admin_panel = document.getElementById('admin_panel');
+var display_zone = document.getElementById('display_zone');
+var request_result = undefined;
+
+var show_all_user_btn = document.getElementById('show_all_user');
+
+window.onload = function() {
+    var status = false;
+    var flag_value = 0;
+    // ajax
+    var myajax = $.ajax({
+        url: "http://127.0.0.1:8080/my",
+        data: {
+            flag: flag_value,
+        },
+        type: "get",
+        success: function(data) {
+            status = true;
+            current_user = data.current_user;
+        }
+    });
+
+    // 根据 status 的状态 进行后续操作
+    // myajax 请求完毕时执行
+    $.when(myajax).done(function() {
+        if (status) {
+            if (current_user == undefined) {
+                alert('Fail to get userinfo. Please login!');
+                window.location = 'index.html';
+                return;
+            } 
+            else if (current_user.isAdmin != '1') {
+                alert('You can not access this page');
+                window.location = 'index.html';
+                return;
+            }
+            else {
+                flag = 1;
+                photo.src = current_user.photo;
+                document.getElementById('username').innerText = current_user.username;
+                document.getElementById('email').innerText = current_user.email;
+            }
+        }
+    });
+
+    // if (current_user == undefined) {
+    //     alert('Fail to get userinfo. Please login!');
+    //     setTimeout("window.location = 'index.html'", 500);
+    //     return;
+    // }
+}
+
+function logout() {
+    current_user = undefined;
+}
+
+
+function modify_pwd() {
+    old_pwd = document.getElementById('old').value;
+    new_pwd = document.getElementById('new').value;
+    verif = document.getElementById('verif').value;
+
+    if (new_pwd != verif) {
+        alert('Please verify your new password again.');
+        return;
+    } else if (old_pwd != current_user.password) {
+        alert('Wrong old password.');
+        return;
+    } else if (new_pwd.length < 8) {
+        alert('New password is not strong enough.');
+        return;
+    } else {
+        var status = false;
+        flag_value = 3
+            // ajax
+        var myajax = $.ajax({
+            url: "http://127.0.0.1:8080/my",
+            data: {
+                flag: flag_value,
+                new: new_pwd,
+                current_user: current_user,
+            },
+            type: "get",
+            success: function(data) {
+                status = true;
+                verify_flag = data.v;
+            }
+        });
+
+        // 根据 status 的状态 进行后续操作
+        // myajax 请求完毕时执行
+        $.when(myajax).done(function() {
+            if (status) {
+                if (verify_flag = 0) {
+                    alert('Fail to modify password.');
+                    return;
+                }
+                verify_flag = 0;
+                modify.value = 'Modify successfully!'
+                document.getElementById('old').value = ''
+                document.getElementById('new').value = ''
+                document.getElementById('verif').value = ''
+            }
+        });
+    }
+
+    var time = 600;
+    var mytime = null;
+
+    function subs() {
+        time--;
+        $('#modify').attr("value", "Please wait for " + time + " seconds");
+        $('#modify').attr("color", 'red');
+        if (time === 0) {
+            time = 600;
+            clearInterval(mytime);
+            $('#modify').attr("value", "modify");
+            $('#modify').attr("disabled", false); //按键可用
+        } else {
+            $('#modify').attr("disabled", true); //按键不可用
+        }
+    }
+    //设置一个定时，一秒执行一次
+    mytime = setInterval(function() {
+        subs();
+    }, 1000)
+}
+
+//上传photo
+$(function() {
+    // 封装ajax函数
+    function update(url, formdata, callback) {
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formdata,
+            dataType: "json",
+            processData: false, // jQuery不要去处理发送的数据
+            contentType: false,
+            success: function(data) {
+                callback(data)
+            },
+            error: function(err) {
+                console.log("Server failure.", err);
+                $("#text").text("Server failure. Please upload again!")
+            }
+
+        })
+    }
+    // 执行input时间时调用
+    $("#pic").change(function() {
+        var imgSize = 4000000
+        var zzz = /\.(jpg|png|jpeg|bmp)/i
+        var str = this.files[0].name
+        var sizes = this.files[0].size
+        var last = str.lastIndexOf('.')
+        var jq = str.substring(last, last.length).toLowerCase();
+        if (zzz.test(jq) && sizes <= imgSize) {
+
+            var url = "http://127.0.0.1:8080/picture"
+            var imgFiles = $("#pic")[0].files[0]
+            var formdata = new FormData()
+            formdata.append("imges", imgFiles)
+            formdata.append("user_id", current_user.id)
+            update(url, formdata, function(data) {
+                console.log(data)
+                if (data.code < 0) {
+                    $("#text").text(data.msg)
+                }
+                $("#text").text(data.msg)
+                console.log(data.urls);
+                photo.src = data.urls;
+                // var localsto = window.localStorage
+                // localStorage.setItem("src", data.urls)
+                // $('.imgbox img').attr('src', localsto.src);
+
+            })
+
+        } else {
+            alert("请选择一张正确的图片并且大小不能大于4M")
+        }
+    })
+
+    // // 将服务端返回的数据保存在localStorage中
+    // window.onload = function() {
+    //     var localsto = window.localStorage
+    //     $('.imgbox img').attr('src', localsto.src);
+    // }
+})
+
+function show_all_user() {
+    var status = false;
+    // ajax
+    var myajax = $.ajax({
+        url: "http://127.0.0.1:8080/admin",
+        data: {
+            command: 'show_all_user',
+        },
+        type: "get",
+        success: function(data) {
+            status = true;
+            request_result = data.dataset;
+            console.log(request_result);
+        }
+    });
+
+    // 根据 status 的状态 进行后续操作
+    // myajax 请求完毕时执行
+    $.when(myajax).done(function() {
+        if (status) {
+            if (request_result == null) {
+                alert('database error, please check');
+                return;
+            }
+            if (request_result == 'no_row_return') {
+                display_zone.innerHTML = '<div>no_row_return</div>'
+                return;
+            }
+            for (var i = 0; i < request_result.length; i++) {
+                var new_div = document.createElement("div");
+                new_div.innerHTML = request_result[i].id + ' ' + request_result[i].username + ' ' + request_result[i].password + ' ' + request_result[i].email + ' ' + request_result[i].isAdmin;
+                display_zone.appendChild(new_div);
+            }
+        }
+    });
+}
+
+//显示上传文件路径
+$("#pic").change(function() {
+    $("#text").html($("#pic").val());
+})
+
+modify.addEventListener('click', modify_pwd);
+
+to_admin_btn.onclick = function() {
+    admin_panel.style.display = 'block';
+    normal_panel.style.display = 'none';
+}
+
+to_normal_btn.onclick = function() {
+    admin_panel.style.display = 'none';
+    normal_panel.style.display = 'block';
+}
+
+show_all_user_btn.onclick = function() {
+    console.log('show all user');
+    show_all_user();
+}
